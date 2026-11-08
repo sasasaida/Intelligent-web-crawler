@@ -7,6 +7,7 @@ import numpy as np
 from scipy.sparse import coo_matrix, csr_matrix
 
 from src.data_loader import load_edge_list
+from src.pagerank import calculate_pagerank
 
 PathType = Union[str, Path]
 Edge = Tuple[int, int]
@@ -104,3 +105,25 @@ def process_graph(
         statistics["out_degree"],
         statistics,
     )
+
+
+def load_graph_data(dataset_path: PathType) -> Dict[str, object]:
+    """Load graph data and return aligned IDs, degrees, adjacency, and PageRank.
+
+    The loader's sorted original node IDs define the internal ordering used by
+    the adjacency matrix, degree arrays, and PageRank scores.
+    """
+    edges, original_node_ids, node_to_index = load_edge_list(dataset_path)
+    node_ids = np.asarray(original_node_ids)
+    adjacency = build_adjacency_matrix(edges, len(node_ids))
+    statistics = calculate_graph_statistics(adjacency)
+    pagerank_scores = calculate_pagerank(adjacency)
+
+    return {
+        "adjacency": adjacency,
+        "node_ids": node_ids,
+        "node_to_index": node_to_index,
+        "in_degree": statistics["in_degree"],
+        "out_degree": statistics["out_degree"],
+        "pagerank": pagerank_scores,
+    }
