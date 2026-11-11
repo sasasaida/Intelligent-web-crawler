@@ -1,0 +1,6 @@
+# Generated graph cache
+data/processed/
+
+# Python cache
+__pycache__/
+*.py[cod]
